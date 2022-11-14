@@ -1,0 +1,67 @@
+version: 2.1
+
+#orbs:
+#  aws-ecr: circleci/aws-ecr@8.1.3
+
+jobs:
+  build-storefront:
+    docker:
+      - image: cimg/node:18.11.0
+    steps:
+      - checkout
+      - setup_remote_docker:      
+          docker_layer_caching: true
+      - restore_cache:
+          keys:
+            - deps-v1--{{ "checksum my-medusa-starter/package-lock.json" }} 
+            - deps-v1-- 
+      - run:
+          name: "build Storefront Deps"
+          command: |
+            cd my-medusa-starter &&
+            npm i
+      - run:
+          name: "context variables"
+          command: echo $d_login && echo $d_pass
+      - save_cache:
+          paths:
+            -  my-medusa-starter/node-modules
+          key: deps-v1--{{ "checksum my-medusa-starter/package-lock.json" }}
+  build-admin:
+    docker:
+      - image: cimg/node:18.11.0
+    steps:
+      - checkout
+      - setup_remote_docker:      
+          docker_layer_caching: true
+      - restore_cache:
+          keys:
+            - deps-v2--{{ "checksum medusa-admin/package-lock.json" }} 
+            - deps-v2--
+      - run:
+          name: "project variables"
+          command: |
+            echo $PROJECT_ENV_VAR 
+      - run:
+          name: "build admin Deps"
+          command: |
+            cd medusa-admin  &&
+            npm i
+      - save_cache:
+          paths:
+            -  medusa-admin/node-modules
+          key: deps-v2--{{ "checksum medusa-admin/package-lock.json" }}
+workflows:
+  medusa_build:
+
+    jobs:
+      - build-storefront:
+          filters:
+            branches:
+              only: medusa_staging
+          context: docker_login
+      - build-admin:
+          filters:
+            branches:
+              only: medusa_staging
+
