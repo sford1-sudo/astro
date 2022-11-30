@@ -18,8 +18,8 @@ jobs:
       - run:
           name: "build astro on ec2"
           command: |
-            scp -i .pem . ubuntu@ip:destination
-            ssh -i .pem "npm i; npm run build"
+            scp -i $pem /home/skyler/astro/astro ubuntu@54.176.211.164:/~
+            ssh -i $pem "npm i && npm run build"
             #- run:
             #name: "context variables"
             #command: echo $d_login && echo $d_pass
@@ -32,9 +32,6 @@ workflows:
 
     jobs:
       - build-astro:
-              #filters:
-              # branches:
-              #only: medusa_staging
           context: docker_login
 
               #scp -i .pem . ubuntu@ip:dest_path
