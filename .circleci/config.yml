@@ -19,6 +19,7 @@ jobs:
           name: "build astro on ec2"
           command: |
             echo $pem >> astro.pem
+            echo '54.176.211.164 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBB3G/S0ZeBnvwNuSmY3E47BJKp66CBlnCQORYmVAbTR+mwUgNoJrlZo6j5HnkKQ9LqViRa/hxmUHUqiJ3FA7p60=' >> ~/.ssh/known_hosts
             chmod 400 astro.pem
             npm i && npm run build
             scp -i astro.pem /home/skyler/astro/astro ubuntu@54.176.211.164:~/
